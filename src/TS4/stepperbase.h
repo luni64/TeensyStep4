@@ -22,7 +22,7 @@ namespace TS4
         void doRotateAsync(int32_t v_max, uint32_t a);
         void doStopAsync(int32_t va_end, uint32_t a);
 
-        inline void setDir(int d);
+        //inline void setDir(int d);
         int32_t dir;
         int32_t vDir;
 
