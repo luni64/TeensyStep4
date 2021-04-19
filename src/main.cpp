@@ -41,11 +41,12 @@ void pr()
 
 void setup()
 {
+    for (int pin : {LED_BUILTIN, 0, 1, 2, 14}) { pinMode(pin, OUTPUT); }
     while (!Serial) {}
 
-    TS4::attachErrFunc(ErrorHandler(Serial));
+    TS4::attachErrFunc(ErrorHandler(SerialUSB1));
 
-    TS4::begin(true);
+    TS4::begin();
 
 
 
@@ -67,18 +68,20 @@ void setup()
 
     //    TT t1(s1, s2);
 
-    for (int pin : {LED_BUILTIN, 0, 1, 2}) { pinMode(pin, OUTPUT); }
 
-    // StepperGroup g;
+    // StepperGroup g;10
 
     StepperGroup g  {s1, s2};
+    s1.setAcceleration(20000);
+    s1.setMaxSpeed(500);
+    s2.setMaxSpeed(2000);
+    //g.move({1000,20});
+    s1.moveAbsAsync(20);
+    // delay(500);
+    // s1.moveAbsAsync(3000,400);
 
-    s1.setMaxSpeed(10000);
-    s2.setMaxSpeed(200);
-    g.move();
-
-    delay(2000);
-    g.stopAsync();
+    // delay(2000);1
+    // g.stopAsync();
 
     //g.move();
 

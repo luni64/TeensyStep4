@@ -12,13 +12,11 @@ namespace TS4
         emptyGroup=       -100,
 
 
-
-
         //General errors
         argument =         100,
         callback=          101,
         reload=            102,
-        noFreeModule =     103,
+        noModule =     103,
         noFreeChannel =    104,  // requested module has no free channel
         notImplemented=    105,  // timer does not support this feature
         notInitialized=    106,

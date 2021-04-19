@@ -37,51 +37,68 @@ namespace TS4
 
     errorCode StepperBase::doMoveAsync(int32_t _s_tgt, uint32_t v_s, uint32_t v_e, uint32_t v_tgt, uint32_t a)
     {
-        s          = 0;
-        int32_t ds = std::abs(_s_tgt - pos);
-        s_tgt      = ds;
+        twoA  = 2 * a;
+        s_tgt = _s_tgt;
+        v_sqr = 0;
+        v_tgt_sqr = v_tgt * v_tgt - twoA;
+        //     s          = 0;
+        //     int32_t ds = std::abs(_s_tgt - pos);
+        //     s_tgt      = ds;
 
-        dir = signum(_s_tgt - pos);
-        digitalWriteFast(dirPin, dir > 0 ? HIGH : LOW);
-        delayMicroseconds(5);
+        //     dir = signum(_s_tgt - pos);
+        //     digitalWriteFast(dirPin, dir > 0 ? HIGH : LOW);
+        //     delayMicroseconds(5);
 
-        twoA = 2 * a;
-        //v_sqr      = (int64_t) v * v;
-        v_sqr     = 0;
-        v         = 0;
-        v_tgt_sqr = (int64_t)v_tgt * v_tgt;
+        //     twoA = 2 * a;
+        //     //v_sqr      = (int64_t) v * v;
+        //     //v_sqr = v * v;
+        //     //v         = 0;
+        //     v_tgt_sqr = (int64_t)v_tgt * v_tgt;
 
-        int64_t accLength = (v_tgt_sqr - v_sqr) / twoA + 1;
-        if (accLength >= ds / 2) accLength = ds / 2;
+        //     int64_t accLength = std::abs(v_tgt_sqr - v_sqr) / twoA + 1;
 
-        accEnd   = accLength - 1;
-        decStart = s_tgt - accLength;
+        //     if (v_tgt_sqr >= v_sqr)
+        //     {
+        //          if (accLength >= s_tgt / 2) accLength = s_tgt / 2;
 
-        // SerialUSB1.printf("TimerAddr: %p\n", &stpTimer);
-        // SerialUSB1.printf("a: %6d   twoA:  %6d\n", a, twoA);
-        // SerialUSB1.printf("v0:%6d   v_tgt: %6d\n", v, v_tgt);
-        // SerialUSB1.printf("s: %6d   s_tgt: %6d\n", s, s_tgt);
-        // SerialUSB1.printf("aE:%6d   dS:    %6d %d\n\n", accEnd, decStart, accLength);
+        //         accEnd   = accLength - 1;
+        //         decStart = s_tgt - accLength;
+        //     }
+        //     else
+        //     {
+        //         twoA     = -2 * a;
+        //         accEnd   = accLength - 1;
+        //         decStart = s_tgt - accLength;
+        //     }
+
+        //     SerialUSB1.printf("Stepper: %s\n", name.c_str());
+        //     SerialUSB1.printf("Timer: %p\n", stpTimer);
+        //     SerialUSB1.printf("a: %6d   twoA:  %6d\n", a, twoA);
+        //     SerialUSB1.printf("v:%6d   v_tgt: %6d\n", v, v_tgt);
+        //     SerialUSB1.printf("s: %6d   s_tgt: %6d pos:%6d\n", s, s_tgt, pos);
+        //     SerialUSB1.printf("aE:%6d   dS:    %6d \n\n", accEnd, decStart);
 
         if (stpTimer == nullptr)
         {
-            if (!TimerFactory::hasFreeTimer) return errorCode::noFreeTimer;
+            if (!TimerFactory::hasFreeTimer()) return errorCode::noFreeTimer;
 
             stpTimer = TimerFactory::makeTimer();
             stpTimer->attachCallbacks([this] { stepISR(); }, [this] { resetISR(); });
             stpTimer->setPulseParams(8, stepPin);
             isMoving = true;
-            v_sqr    = v_s * v_s;
+            v_sqr    = 200*200 - twoA;
+     //       v_s* v_s;
             mode     = mode_t::target;
             stpTimer->start();
+           // stepISR();
         }
         return errorCode::OK;
     }
 
-    // void StepperBase::rotateAsync()
-    // {
-    //     rotateAsync(vMax);
-    // }
+    // // void StepperBase::rotateAsync()
+    // // {
+    // //     rotateAsync(vMax);
+    // // }
 
     void StepperBase::doStopAsync(int32_t v_end, uint32_t a)
     {
@@ -92,4 +109,5 @@ namespace TS4
         // SerialUSB1.println("stoprot");
         //SerialUSB1.flush();
     }
+
 }

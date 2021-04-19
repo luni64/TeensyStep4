@@ -1,4 +1,5 @@
 #include "timerfactory.h"
+#include "../ErrorHandling/error_handler.h"
 #include <vector>
 
 namespace TS4
@@ -20,6 +21,8 @@ namespace TS4
 
         ITimer* makeTimer()
         {
+            if (modules.empty()) postError(errorCode::noModule);
+
             for (ITimerModule* m : modules)
             {
                 ITimer* timer = m->getChannel();

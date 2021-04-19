@@ -23,6 +23,7 @@ namespace TS4
 
     void Stepper::moveAbsAsync(int32_t target, uint32_t v)
     {
+      //  postError(errorCode::message, "movaAbsAsync");
         StepperBase::doMoveAsync(target, 200, 0, (v == 0 ? vMax : v), acc);
     }
 
@@ -43,6 +44,7 @@ namespace TS4
 
     void Stepper::moveAbs(int32_t target, uint32_t v)
     {
+        next = nullptr;
         moveAbsAsync(target, v);
         while (isMoving)
         {

@@ -35,8 +35,8 @@ namespace TS4
             case errorCode::noFreeChannel:
                 txt = "Timer module has no free channel";
                 break;
-            case errorCode::noFreeModule:
-                txt = "Timer pool contains no free timer";
+            case errorCode::noModule:
+                txt = "No timer module attached to testtext TimerFactory. Did you forget to call TS4::begin()? ";
                 break;
             case errorCode::notImplemented:
                 txt = "Function not implemented for this timer";

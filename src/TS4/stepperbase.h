@@ -1,9 +1,9 @@
 #pragma once
 
 #include "Arduino.h"
+#include "ErrorHandling/error_handler.h"
 #include "timers/interfaces.h"
 #include "timers/timerfactory.h"
-#include "ErrorHandling/error_handler.h"
 #include <algorithm>
 #include <cstdint>
 
@@ -32,7 +32,7 @@ namespace TS4
         int32_t v_tgt;
         int64_t v_tgt_sqr;
 
-        int32_t twoA, decStart, accEnd;
+        int32_t twoA, decStart, accEnd, accLen;
 
         volatile int32_t s;
         volatile int32_t v;
@@ -66,34 +66,66 @@ namespace TS4
 
     void StepperBase::stepISR()
     {
-        if (s < accEnd) // accelerating
+        if (s != s_tgt)
         {
-            int32_t v_abs = std::abs(v_sqr);
-            v = signum(v_sqr) * sqrtf(v_abs);
+            stpTimer->up dateFrequency(sqrtf(std::abs((v_sqr))));
+            makeStep();
+        }
+
+
+        int32_t ds    = s_tgt - pos;
+        int32_t _twoA = twoA * signum(ds);
+
+        int32_t accLen = std::abs(v_sqr / twoA);
+        //if (accLen > std::abs(ds / 2)) accLen = std::abs(ds / 2);
+
+        SerialUSB1.printf("ds: %d , twoA: %d, accLen: %d\n", ds, _twoA, accLen);
+         SerialUSB1.printf("vsqr: %.0f \n", (float)v_sqr);
+
+        if (ds > accLen)
             v_sqr += twoA;
-            stpTimer->updateFrequency(v_abs);
-            makeStep();
-        }
-        else if (s < decStart) // constant speed
-        {
-            v = std::min(sqrtf(v_sqr), sqrtf(v_tgt_sqr));
-            stpTimer->updateFrequency(v);
-            makeStep();
-        }
-        else if (s < s_tgt) // decelerating
-        {
+        else
             v_sqr -= twoA;
-            v = signum(v_sqr) * sqrtf(std::abs(v_sqr));
-            stpTimer->updateFrequency(std::abs(v));
-            makeStep();
-        }
-        else // target reached
-        {
-            stpTimer->stop();
-            TimerFactory::returnTimer(stpTimer);
-            stpTimer = nullptr;
-            isMoving = false;
-        }
+        SerialUSB1.printf("vsqr2: %.0f \n", (float)v_sqr);
+
+        dir = signum(v_sqr);
+        digitalWriteFast(dirPin, dir >= 0 ? HIGH : LOW);
+        delayMicroseconds(5);
+
+
+        // if (s < accEnd) // accelerating
+        // {
+        //     //postError(errorCode::message, "acc");
+        //     int32_t v_abs = sqrtf(std::abs(v_sqr));
+        //     v             = signum(v_sqr) * v_abs;
+        //     v_sqr += twoA;
+        //     stpTimer->updateFrequency(v_abs);
+        //     makeStep();
+        // }
+        // else if (s < decStart) // constant speed
+        // {
+        //     //postError(errorCode::message, "const");
+        //     //v = std::min(sqrtf(v_sqr), sqrtf(v_tgt_sqr));
+        //     v = sqrtf(v_sqr);
+
+        //     stpTimer->updateFrequency(v);
+        //     makeStep();
+        // }
+        // else if (s < s_tgt) // decelerating
+        // {
+        //     //postError(errorCode::message, "dec");
+        //     v_sqr -= twoA;
+        //     v = signum(v_sqr) * sqrtf(std::abs(v_sqr));
+        //     stpTimer->updateFrequency(std::abs(v));
+        //     makeStep();
+        // }
+        // else // target reached
+        // {
+        //     stpTimer->stop();
+        //     TimerFactory::returnTimer(stpTimer);
+        //     stpTimer = nullptr;
+        //     isMoving = false;
+        // }
     }
 
     void StepperBase::rotISR()

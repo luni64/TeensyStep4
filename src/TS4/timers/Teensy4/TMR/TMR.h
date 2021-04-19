@@ -244,6 +244,7 @@ namespace TS4
     template <unsigned moduleNr>
     void TMRModule<moduleNr>::ISR()
     {
+        digitalWriteFast(14, HIGH);
         for (int ch = 0; ch < 4; ch++)
         {
             if (!isFree[ch] && (channels[ch]->regs->CSCTRL & TMR_CSCTRL_TCF1))
@@ -253,6 +254,7 @@ namespace TS4
             }
         }
         asm volatile("dsb"); //wait until register changes propagated through the cache
+        digitalWriteFast(14, LOW);
     }
 
     // initialize static members ---------------------------------------------------------------------------------------------
