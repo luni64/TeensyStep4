@@ -1,3 +1,4 @@
+# see https://clang.llvm.org/docs/ClangFormatStyleOptions.html
 ---
 Standard: Cpp11
 BasedOnStyle: LLVM
@@ -16,7 +17,7 @@ IndentCaseLabels: true
 PointerAlignment: Left
 
 AlignTrailingComments: true
-AlignConsecutiveAssignments: true
+AlignConsecutiveAssignments: 
 
 NamespaceIndentation: All
 FixNamespaceComments: false

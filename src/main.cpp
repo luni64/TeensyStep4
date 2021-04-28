@@ -8,6 +8,8 @@ Stepper s1(0, 1);
 Stepper s2(5, 6);
 Stepper s3(7, 8);
 
+
+
 // struct TT
 // {
 //     TT(Stepper& x, Stepper& y)
@@ -27,7 +29,7 @@ Stepper s3(7, 8);
 
 void pr()
 {
-    static int old1 = 0;
+    static int old112 = 0;
     static int old2 = 0;
     int newP1       = s1.getPosition();
     int newP2       = s2.getPosition();
@@ -48,8 +50,6 @@ void setup()
 
     TS4::begin();
 
-
-
     s1
         .setMaxSpeed(15001)
         .setAcceleration(50'000)
@@ -68,10 +68,9 @@ void setup()
 
     //    TT t1(s1, s2);
 
-
     // StepperGroup g;10
 
-    StepperGroup g  {s1, s2};
+    StepperGroup g{s1, s2};
     s1.setAcceleration(20000);
     s1.setMaxSpeed(500);
     s2.setMaxSpeed(2000);
@@ -87,17 +86,17 @@ void setup()
 
     //delay(3);
 
-//    Serial.printf("done %d %d %d\n", s1.getPosition(), s2.getPosition(), s3.getPosition());
+    //    Serial.printf("done %d %d %d\n", s1.getPosition(), s2.getPosition(), s3.getPosition());
 
-//     // s1.setTargetAbs(1000);
-//     // s1.moveAsync();
+    //     // s1.setTargetAbs(1000);
+    //     // s1.moveAsync();
 
-//     s1.setTargetAbs(-1600);
-//     s2.setTargetAbs(-10000);
-//     s3.setTargetAbs(-300);
-//     g.move();
-// Serial.printf("done %d %d %d\n", s1.getPosition(), s2.getPosition(), s3.getPosition());
-//     // transport.moveAsyc();
+    //     s1.setTargetAbs(-1600);
+    //     s2.setTargetAbs(-10000);
+    //     s3.setTargetAbs(-300);
+    //     g.move();
+    // Serial.printf("done %d %d %d\n", s1.getPosition(), s2.getPosition(), s3.getPosition());
+    //     // transport.moveAsyc();
 
     // StepperGroup xyTrans{s2, s2, s1};
 

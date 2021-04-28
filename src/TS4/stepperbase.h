@@ -68,10 +68,9 @@ namespace TS4
     {
         if (s != s_tgt)
         {
-            stpTimer->up dateFrequency(sqrtf(std::abs((v_sqr))));
+            stpTimer->updateFrequency(sqrtf(std::abs((v_sqr))));
             makeStep();
         }
-
 
         int32_t ds    = s_tgt - pos;
         int32_t _twoA = twoA * signum(ds);
@@ -80,7 +79,7 @@ namespace TS4
         //if (accLen > std::abs(ds / 2)) accLen = std::abs(ds / 2);
 
         SerialUSB1.printf("ds: %d , twoA: %d, accLen: %d\n", ds, _twoA, accLen);
-         SerialUSB1.printf("vsqr: %.0f \n", (float)v_sqr);
+        SerialUSB1.printf("vsqr: %.0f \n", (float)v_sqr);
 
         if (ds > accLen)
             v_sqr += twoA;
@@ -91,7 +90,6 @@ namespace TS4
         dir = signum(v_sqr);
         digitalWriteFast(dirPin, dir >= 0 ? HIGH : LOW);
         delayMicroseconds(5);
-
 
         // if (s < accEnd) // accelerating
         // {
