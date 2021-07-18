@@ -47,7 +47,7 @@ namespace TS4
             while (1)
             {
                 delay(5);
-                SerialUSB1.print('.');
+                //SerialUSB1.print('.');
                 bool done = true;
                 for (auto stepper : steppers)
                 {

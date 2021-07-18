@@ -45,19 +45,19 @@ namespace TS4
         {
             if (steppers.empty()) return;
 
-            SerialUSB1.println("srot");
+            //SerialUSB1.println("srot");
 
             auto deltaSorter = [](Stepper* a, Stepper* b) { return a->vMax > b->vMax; };
 
-            SerialUSB1.printf("0: %s %d, 1: %s %d\n", steppers[0]->name.c_str(), steppers[0]->vMax, steppers[1]->name.c_str(), steppers[1]->vMax);
-            SerialUSB1.flush();
+            // SerialUSB1.printf("0: %s %d, 1: %s %d\n", steppers[0]->name.c_str(), steppers[0]->vMax, steppers[1]->name.c_str(), steppers[1]->vMax);
+            // SerialUSB1.flush();
 
             std::vector<Stepper*> sorted = steppers;              // copy stepper list..
             std::sort(sorted.begin(), sorted.end(), deltaSorter); // ...and sort by "steps to do"
 
             leadStepper = sorted[0]; // this stepper will lead the movement, steps of the other motors are calculated by Bresenham algorithm
             leadStepper->A       = std::abs(leadStepper->vMax);
-           
+
             //
             for (unsigned i = 1; i < sorted.size(); i++) // loop through the dependent motors
             {

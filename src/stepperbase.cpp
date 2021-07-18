@@ -60,11 +60,11 @@ namespace TS4
         accEnd   = accLength - 1;
         decStart = s_tgt - accLength;
 
-        SerialUSB1.printf("TimerAddr: %p\n", &stpTimer);
-        SerialUSB1.printf("a: %6d   twoA:  %6d\n", a, twoA);
-        SerialUSB1.printf("v0:%6d   v_tgt: %6d\n", v, v_tgt);
-        SerialUSB1.printf("s: %6d   s_tgt: %6d\n", s, s_tgt);
-        SerialUSB1.printf("aE:%6d   dS:    %6d %d\n\n", accEnd, decStart, accLength);
+        // SerialUSB1.printf("TimerAddr: %p\n", &stpTimer);
+        // SerialUSB1.printf("a: %6d   twoA:  %6d\n", a, twoA);
+        // SerialUSB1.printf("v0:%6d   v_tgt: %6d\n", v, v_tgt);
+        // SerialUSB1.printf("s: %6d   s_tgt: %6d\n", s, s_tgt);
+        // SerialUSB1.printf("aE:%6d   dS:    %6d %d\n\n", accEnd, decStart, accLength);
 
         if (!isMoving)
         {
@@ -91,7 +91,7 @@ namespace TS4
         mode = mode_t::stopping;
         startRotate(v_end, a);
         mode = mode_t::stopping;
-        SerialUSB1.println("stoprot");
-        SerialUSB1.flush();
+        // SerialUSB1.println("stoprot");
+        // SerialUSB1.flush();
     }
 }

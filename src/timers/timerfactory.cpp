@@ -11,17 +11,17 @@ namespace TS4
     namespace TimerFactory
     {
         void attachModule(ITimerModule* module)
-        {           
+        {
             modules.push_back(module);
         }
 
         ITimer* makeTimer()
-        {   
+        {
             for (ITimerModule* m : modules)
             {
                 ITimer* timer = m->getChannel();
                 if (timer != nullptr) return timer;
-            }         
+            }
             return nullptr;
         }
 

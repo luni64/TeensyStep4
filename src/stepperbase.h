@@ -142,7 +142,7 @@ namespace TS4
                 doStep();
             } else
             {
-                SerialUSB1.printf("rotISR %s stopped\n", name.c_str());
+                //SerialUSB1.printf("rotISR %s stopped\n", name.c_str());
                 stpTimer->stop();
                 TimerFactory::returnTimer(stpTimer);
                 stpTimer = nullptr;
