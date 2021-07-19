@@ -9,51 +9,51 @@ namespace TS4
     class StepperGroup : public StepperGroupBase
     {
      public:
-        StepperGroup()
-        {}
+        // construction ---------------------------------------------------------------------------------
+        StepperGroup() = default;
+        StepperGroup(Stepper* arr[], size_t n) { add(arr, n); }
+        StepperGroup(std::initializer_list<std::reference_wrapper<Stepper>> stepperList) { add(stepperList); }
 
-        StepperGroup(Stepper* arr[], size_t n)
+        // add and remove steppers ----------------------------------------------------------------------------
+        void add(Stepper& s) { add(&s); }
+        void add(Stepper* s) { steppers.push_back(s); }
+
+        void add(std::initializer_list<std::reference_wrapper<Stepper>> stepperList)
         {
-            for (size_t i = 0; i < n; i++)
+            for (auto& s : stepperList)
             {
-                // steppers.push_back(arr[i]);
-                arr++;
+                add(s.get());
             }
         }
 
-        StepperGroup(std::initializer_list<std::reference_wrapper<Stepper>> il)
+        void add(Stepper* arr[], size_t n)
         {
-            //Serial.println("ctr ref list");
-            for (auto s : il)
+            for (unsigned i = 0; i < n; i++)
             {
-                Stepper* p = &(s.get());
-                steppers.push_back(p);
+                add(arr[i]);
             }
         }
 
-        static StepperGroup make(std::initializer_list<std::reference_wrapper<Stepper>> il)
-        {
-            return StepperGroup(il);
-        }
+        void remove(Stepper& s) { remove(&s); }
+        void remove(Stepper* s) { steppers.erase(std::remove(steppers.begin(), steppers.end(), s), steppers.end()); }
 
-        void add(Stepper& s)
-        {
-            steppers.push_back(&s);
-        }
+        void clear() { steppers.clear(); }
+
+
 
         void move()
         {
-            startMove();
-            while (1)
+            startMove(); // start movement in the background
+            while (1)    // wait until all steppers have stopped
             {
-                delay(5);
-                //SerialUSB1.print('.');
+                delay(1);
                 bool done = true;
                 for (auto stepper : steppers)
                 {
-                    if (stepper->isMoving) done = false;
+                    if (stepper->isMoving)
+                        done = false;
                 }
-                if (done) return;
+                if (done) break;
             }
         }
 
@@ -65,4 +65,4 @@ namespace TS4
         //     steppers[1]->rotateAsyncB(steppers[1]->vMax, a2);
         // }
     };
-} // namespace TS4
+}
