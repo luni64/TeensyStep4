@@ -9,6 +9,8 @@ Stepper s3(2, 5);
 
 void setup()
 {
+    pinMode(LED_BUILTIN, OUTPUT);
+
     TS4::begin();
 
     s1
