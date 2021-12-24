@@ -6,7 +6,7 @@
 #include <array>
 #include <utility>
 
-template <typename Derived, typename callback_t, typename state_t, unsigned N>
+template <typename Derived, unsigned N, typename state_t, typename callback_t = void(state_t)>
 class CallbackStateHelper
 {
  public:
@@ -29,11 +29,11 @@ class CallbackStateHelper
 };
 
 // intialize static variables --------------------
-template <typename Derived, typename callback_t, typename state_t, unsigned N>
-callback_t* CallbackStateHelper<Derived, callback_t, state_t, N>::callback[N];
+template <typename Derived, unsigned N, typename state_t, typename callback_t>
+callback_t* CallbackStateHelper<Derived, N, state_t, callback_t>::callback[N];
 
-template <typename Derived, typename callback_t, typename state_t, unsigned N>
-state_t CallbackStateHelper<Derived, callback_t, state_t, N>::state[N];
+template <typename Derived, unsigned N, typename state_t, typename callback_t>
+state_t CallbackStateHelper<Derived, N, state_t, callback_t>::state[N];
 
-template <typename Derived, typename callback_t, typename state_t, unsigned N>
-const std::array<void (*)(), N> CallbackStateHelper<Derived, callback_t, state_t, N>::relay = CallbackStateHelper::MakeRelays(std::make_index_sequence<N>{});
+template <typename Derived, unsigned N, typename state_t, typename callback_t>
+const std::array<void (*)(), N> CallbackStateHelper<Derived, N, state_t, callback_t>::relay = CallbackStateHelper::MakeRelays(std::make_index_sequence<N>{});

@@ -1,11 +1,26 @@
 #include "Arduino.h"
 #include "TS5/PulseGenerator.h"
+#include "TS5/timers/timerfactory.h"
+#include "TS5/log.h"
+
+using namespace TS4;
 
 PulseGenerator pg(11);
 
+auto* t = TimerFactory::makeTimer(11);
+
 void setup()
 {
-     asm(".global _printf_float");
+    while (!Serial) {}
+    asm(".global _printf_float");
+
+    t->start();
+
+    LOG("Start");
+
+
+
+
     for (int pin : {LED_BUILTIN, 0, 1, 2, 11}) { pinMode(pin, OUTPUT); }
 
     while (!Serial) {}
@@ -34,9 +49,9 @@ void loop()
         oldV = curV;
     }
 
-    if (sw >= 20)
+    if (sw >= 200)
     {
-        sw -= 20;
+        sw -= 200;
         digitalToggleFast(LED_BUILTIN);
     }
 }

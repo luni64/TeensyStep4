@@ -7,7 +7,7 @@ class PulseGenerator;
 using pG_state_t    = IMXRT_TMR_CH_t*;
 using pG_callback_t = void(pG_state_t);
 
-class PulseGenerator: public CallbackStateHelper<PulseGenerator, pG_callback_t, pG_state_t, 4>
+class PulseGenerator: public CallbackStateHelper<PulseGenerator, 4, IMXRT_TMR_CH_t*>
 {
  public:
     PulseGenerator(uint8_t pin);

@@ -1,4 +1,4 @@
-#include "TMR.h"
+#include "TMRChannel.h"
 
 //#if defined (ARDUINO_TEENSY_MICROMOD)
 

@@ -1,7 +1,7 @@
 #pragma once
 #include "Arduino.h"
-#include <functional>
-#include <vector>
+
+#include <memory>
 
 namespace TS4
 {
@@ -16,10 +16,9 @@ namespace TS4
     class ITimer
     {
      public:
-        virtual void setPulseParams(float width, unsigned pin)              = 0;
-        virtual void attachCallbacks(callback_t stepCb, callback_t resetCb) = 0;
-        virtual void updateFrequency(float f)                               = 0;
+        virtual void begin(unsigned pin, float pulseWidth)                  = 0;
         virtual void start()                                                = 0;
+
         virtual void stop()                                                 = 0;
 
         virtual ~ITimer() {}
@@ -36,6 +35,6 @@ namespace TS4
      public:
         virtual ITimer* getChannel()         = 0;
         virtual void releaseChannel(ITimer*) = 0;
-        virtual size_t getFreeChannels()         = 0;
+        virtual size_t getFreeChannels()     = 0;
     };
 }
