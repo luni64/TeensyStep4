@@ -2,47 +2,46 @@
 
 #include "../../../CallbackStateHelper.h"
 #include "../../interfaces.h"
+#include "TS5/log.h"
 #include "arduino.h"
 #include "imxrt.h"
-#include "TS5/log.h"
 
 namespace TS4
 {
-    class TmrChannel : public ITimer, protected CallbackStateHelper<TmrChannel, 16, IMXRT_TMR_t*>
+    class TmrChannel : public IPinTimer, protected CallbackStateHelper<TmrChannel, 16, IMXRT_TMR_t*>
     {
      public:
-        inline TmrChannel(IMXRT_TMR_CH_t* const regs);
-        inline TmrChannel(int moduleNr, int channelNr);
+        //inline TmrChannel(IMXRT_TMR_CH_t* const regs);
+        inline TmrChannel(int moduleNr, int channelNr, StepperBase* stepper);
         ~TmrChannel() { stop(); }
 
-        void begin(unsigned pin, float pulseWidth) override {LOG("%d", pin)}
+        void begin(unsigned pin, float pulseWidth) override { LOG("%d", pin) }
 
         inline void setPulseParams(float width, unsigned pin);
 
         inline void updateFrequency(float f);
         inline void start() override;
         inline void stop() override;
+        //void attachStepcallback(callback_t) override{}
 
         //inline void attachCallbacks(callback_t stepCb, callback_t resetCb);
 
      protected:
-        static void isr(IMXRT_TMR_t* mreg)
+        void isr(IMXRT_TMR_t* mreg)
         {
-            // for(IMXRT_TMR_CH_t& reg : mreg->CH)
-            // {
-
-            // }
         }
 
-        static constexpr int prescale = 5; // 1->2, 2->4, 3->8...7->128
+      
 
-        callback_t stepCB;
-        callback_t resetCB;
+        static constexpr int prescale = 7; // 1->2, 2->4, 3->8...7->128
+
+        // callback_t stepCB;
+        // callback_t resetCB;
         uint8_t stpPin;
         uint16_t pulsewidth;
         uint16_t period;
 
-        IMXRT_TMR_t* module;
+        IMXRT_TMR_t* const mregs;
         IMXRT_TMR_CH_t* const regs;
 
         inline void ISR();
@@ -55,30 +54,32 @@ namespace TS4
 
     // inline implementation ===========================================================
 
-    TmrChannel::TmrChannel(int moduleNr, int channelNr)
-        : module(moduleNr == 0   ? &IMXRT_TMR1
-                 : moduleNr == 1 ? &IMXRT_TMR2
-                 : moduleNr == 2 ? &IMXRT_TMR3
-                                 : &IMXRT_TMR4),
-          regs(&module->CH[channelNr])
+    TmrChannel::TmrChannel(int moduleNr, int channelNr, StepperBase* stepper)
+        : mregs(moduleNr == 0   ? &IMXRT_TMR1
+                : moduleNr == 1 ? &IMXRT_TMR2
+                : moduleNr == 2 ? &IMXRT_TMR3
+                                : &IMXRT_TMR4),
+          regs(&mregs->CH[channelNr])
     {
 
-        // state[moduleNr] = module;
+        // state[moduleNr] = mregs;
         // callback[moduleNr] = isr();
         // attachInterruptVector(IRQ_QTIMER1 + moduleNr, relay[moduleNr]);
 
-        LOG("module %d channel %d registers: %p\n", moduleNr, channelNr, regs);
+        LOG("mregs %d channel %d registers: %p", moduleNr, channelNr, regs);
 
         regs->CTRL   = 0x0000;                                                                        // disable counter
         regs->CSCTRL = TMR_CSCTRL_CL1(1) | TMR_CSCTRL_CL2(2) | TMR_CSCTRL_CL1(1) | TMR_CSCTRL_TCF1EN; // use preload value for COMP1
 
         regs->LOAD   = 0;
         regs->CNTR   = 0;
-        regs->COMP1  = 1;
-        regs->COMP2  = 1;
-        regs->CMPLD1 = 300;                           // high
-        regs->CMPLD2 = 45000;                         // low
+        regs->COMP1  = 50000;
+        regs->COMP2  = 50000;
+        regs->CMPLD1 = 50000;                         // high
+        regs->CMPLD2 = 50000;                         // low
         regs->SCTRL  = TMR_SCTRL_OEN | TMR_SCTRL_OPS; // directly output to pin
+
+        *(portConfigRegister(11)) = 0x10 | 0x01;
     }
 
     // TmrChannel::TmrChannel(IMXRT_TMR_CH_t* const _regs)
@@ -106,22 +107,9 @@ namespace TS4
     void TmrChannel::start()
     {
         LOG("start");
-        regs->CTRL   = 0x0000;
-        regs->CNTR   = 0x0000;
-        regs->LOAD   = 0x0000;
-        regs->COMP1  = pulsewidth;
-        regs->CMPLD1 = pulsewidth;
 
-        regs->CSCTRL &= ~TMR_CSCTRL_TCF1EN;
-        regs->CSCTRL &= ~TMR_CSCTRL_TCF2EN;
-        regs->CSCTRL &= ~TMR_CSCTRL_TCF1;
-        regs->CSCTRL &= ~TMR_CSCTRL_TCF2;
-        regs->CSCTRL = 0;
-        regs->SCTRL  = 0;
-        regs->CTRL   = TMR_CTRL_CM(1) | TMR_CTRL_PCS(0b1000 | prescale) | TMR_CTRL_LENGTH;
-        regs->CSCTRL |= TMR_CSCTRL_TCF1EN;
-        first = true;
-        ISR();
+        // regs->CTRL   = TMR_CTRL_CM(1) | TMR_CTRL_PCS(0b1000 | prescale) | TMR_CTRL_LENGTH;
+        regs->CTRL = TMR_CTRL_CM(1) | TMR_CTRL_PCS(8 | prescale) | TMR_CTRL_LENGTH | TMR_CTRL_OUTMODE(0b100);
     }
 
     void TmrChannel::stop()
@@ -166,23 +154,22 @@ namespace TS4
         // if (regs->CSCTRL & TMR_CSCTRL_TCF1)
         // {
         //     regs->CSCTRL &= ~TMR_CSCTRL_TCF1; // clear interrupt flag
-        if (first)                     // generate rising edge of pulse
-        {                              //
-            regs->COMP1  = pulsewidth; // set reload to pulse width
-            regs->CMPLD1 = pulsewidth;
-            first        = false;  // generate falling pulse edge when called next
-            stepCB();              //
-        }                          //
-        else                       //
-        {                          //
-            regs->COMP1  = period; // set reload, period is already reduced by the pulsewidth time
-            regs->CMPLD1 = period; //
-            resetCB();             // reset the step pin
-            first = true;          // generate rising edge when called next
-        }
+        // if (first)                     // generate rising edge of pulse
+        // {                              //
+        //     regs->COMP1  = pulsewidth; // set reload to pulse width
+        //     regs->CMPLD1 = pulsewidth;
+        //     first        = false;  // generate falling pulse edge when called next
+        //     stepCB();              //
+        // }                          //
+        // else                       //
+        // {                          //
+        //     regs->COMP1  = period; // set reload, period is already reduced by the pulsewidth time
+        //     regs->CMPLD1 = period; //
+        //     resetCB();             // reset the step pin
+        //     first = true;          // generate rising edge when called next
+        // }
         //}
     }
 
     //====================================================================
-
 }

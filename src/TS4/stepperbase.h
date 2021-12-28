@@ -42,7 +42,7 @@ namespace TS4
 
         const int stepPin, dirPin;
 
-        ITimer* stpTimer;
+        ITimer* stepTimer;
         inline void stepISR();
         inline void rotISR();
         inline void resetISR();
@@ -68,7 +68,7 @@ namespace TS4
     {
         if (s != s_tgt)
         {
-            stpTimer->updateFrequency(sqrtf(std::abs((v_sqr))));
+            stepTimer->updateFrequency(sqrtf(std::abs((v_sqr))));
             makeStep();
         }
 
@@ -97,7 +97,7 @@ namespace TS4
         //     int32_t v_abs = sqrtf(std::abs(v_sqr));
         //     v             = signum(v_sqr) * v_abs;
         //     v_sqr += twoA;
-        //     stpTimer->updateFrequency(v_abs);
+        //     stepTimer->updateFrequency(v_abs);
         //     makeStep();
         // }
         // else if (s < decStart) // constant speed
@@ -106,7 +106,7 @@ namespace TS4
         //     //v = std::min(sqrtf(v_sqr), sqrtf(v_tgt_sqr));
         //     v = sqrtf(v_sqr);
 
-        //     stpTimer->updateFrequency(v);
+        //     stepTimer->updateFrequency(v);
         //     makeStep();
         // }
         // else if (s < s_tgt) // decelerating
@@ -114,14 +114,14 @@ namespace TS4
         //     //postError(errorCode::message, "dec");
         //     v_sqr -= twoA;
         //     v = signum(v_sqr) * sqrtf(std::abs(v_sqr));
-        //     stpTimer->updateFrequency(std::abs(v));
+        //     stepTimer->updateFrequency(std::abs(v));
         //     makeStep();
         // }
         // else // target reached
         // {
-        //     stpTimer->stop();
-        //     TimerFactory::returnTimer(stpTimer);
-        //     stpTimer = nullptr;
+        //     stepTimer->stop();
+        //     TimerFactory::returnTimer(stepTimer);
+        //     stepTimer = nullptr;
         //     isMoving = false;
         // }
     }
@@ -139,7 +139,7 @@ namespace TS4
             delayMicroseconds(5);
 
             v_abs = sqrtf(std::abs(v_sqr));
-            stpTimer->updateFrequency(v_abs);
+            stepTimer->updateFrequency(v_abs);
             makeStep();
         }
         else
@@ -152,15 +152,15 @@ namespace TS4
             if (v_tgt != 0)
             {
                 //  SerialUSB1.printf("vtgt % d\n",v_tgt);
-                stpTimer->updateFrequency(std::abs(v_tgt));
+                stepTimer->updateFrequency(std::abs(v_tgt));
                 makeStep();
             }
             else
             {
                 postError(errorCode::message, "Stopped");
-                stpTimer->stop();
-                TimerFactory::returnTimer(stpTimer);
-                stpTimer = nullptr;
+                stepTimer->stop();
+                TimerFactory::returnTimer(stepTimer);
+                stepTimer = nullptr;
                 isMoving = false;
                 v_sqr    = 0;
             }

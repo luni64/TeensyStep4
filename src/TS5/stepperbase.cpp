@@ -3,14 +3,17 @@
 
 namespace TS4
 {
-    StepperBase::StepperBase(int _stepPin, int _dirPin)
-        : s(0), v(0), v_sqr(0), stepPin(_stepPin), dirPin(_dirPin)
+    
+    StepperBase::StepperBase(const uint _stepPin, const uint _dirPin, const uint _pulseWidth)
+        : stepPin(_stepPin),
+          dirPin(_dirPin),
+          stepTimer(TimerFactory::makeTimer(this))
     {
-        stpTimer = TimerFactory::makeTimer(stepPin);
-
+        stepTimer->attachStepcallback(this);
         pinMode(stepPin, OUTPUT);
         pinMode(dirPin, OUTPUT);
     }
+
 
     void StepperBase::doRotateAsync(int32_t _v_tgt, uint32_t a)
     {
@@ -20,7 +23,7 @@ namespace TS4
         // twoA      = 2 * a;
 
         // // Serial.println("\n---");
-        // // Serial.printf("TimerAddr: %p\n", &stpTimer);
+        // // Serial.printf("TimerAddr: %p\n", &stepTimer);
         // // Serial.printf("v:%6d    v_sqr %6.0f  v_tgt: %6d\n", v, (float)v_sqr, v_tgt);
         // // Serial.printf("a: %6d   twoA: %6d\n", a, twoA);
         // // Serial.printf("moving: %s\n", isMoving ? "yes" : "no");

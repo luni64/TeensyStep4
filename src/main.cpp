@@ -2,21 +2,22 @@
 #include "TS5/PulseGenerator.h"
 #include "TS5/timers/timerfactory.h"
 #include "TS5/log.h"
+#include "TS5/stepperbase.h"
 
 using namespace TS4;
 
 PulseGenerator pg(11);
 
-auto* t = TimerFactory::makeTimer(11);
+StepperBase stepper(11,2);
+
+
 
 void setup()
 {
     while (!Serial) {}
     asm(".global _printf_float");
 
-    t->start();
-
-    LOG("Start");
+    LOG("call start");
 
 
 
@@ -25,7 +26,7 @@ void setup()
 
     while (!Serial) {}
 
-    pg.beginTMR();
+    // pg.beginTMR();
     digitalWriteFast(1, LOW);
 }
 
@@ -52,6 +53,6 @@ void loop()
     if (sw >= 200)
     {
         sw -= 200;
-        digitalToggleFast(LED_BUILTIN);
+       // digitalToggleFast(LED_BUILTIN);
     }
 }

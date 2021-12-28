@@ -9,15 +9,15 @@ namespace TS4
     class TMRModule
     {
      public:
-        static ITimer* getChannel(int chNr);
-        static void releaseChannel(ITimer* ch);
+        static IPinTimer* getChannel(int chNr, StepperBase*);
+        static void releaseChannel(IPinTimer* ch);
 
      protected:
         static void ISR();
 
         static IMXRT_TMR_t* const regs;
-        static bool initialized;
         static TmrChannel* channels[4];
+        static bool initialized;
 
         static constexpr IRQ_NUMBER_t IRQ = moduleNr == 0   ? IRQ_QTIMER1
                                             : moduleNr == 1 ? IRQ_QTIMER2
@@ -28,7 +28,7 @@ namespace TS4
     };
 
     template <unsigned moduleNr>
-    ITimer* TMRModule<moduleNr>::getChannel(int chNr)
+    IPinTimer* TMRModule<moduleNr>::getChannel(int chNr, StepperBase* stepper)
     {
         if (!initialized)
         {
@@ -38,14 +38,14 @@ namespace TS4
             NVIC_ENABLE_IRQ(IRQ);
         }
 
-        channels[chNr] = new TmrChannel(moduleNr, chNr);
+        channels[chNr] = new TmrChannel(moduleNr, chNr, stepper);
 
         return channels[chNr];
     }
 
     //---------------------------------------------------------------------------
     template <unsigned moduleNr>
-    void TMRModule<moduleNr>::releaseChannel(ITimer* ch)
+    void TMRModule<moduleNr>::releaseChannel(IPinTimer* ch)
     {
         // for (int i = 0; i < 4; i++)
         // {
@@ -61,7 +61,7 @@ namespace TS4
     template <unsigned moduleNr>
     void TMRModule<moduleNr>::ISR()
     {
-        LOG("isr");
+        //LOG("isr MODULE");
         for (int ch = 0; ch < 4; ch++)
         {
             if (regs->CH[ch].CSCTRL & TMR_CSCTRL_TCF1)
@@ -69,8 +69,11 @@ namespace TS4
                 regs->CH[ch].CSCTRL &= ~TMR_CSCTRL_TCF1;
                 if (channels[ch] != nullptr)
                 {
-                    LOG("ch isr");
+                    digitalToggleFast(LED_BUILTIN);
+
+                    LOG("%d\n", micros());
                 }
+                //asm volatile("dsb"); //wait until register changes propagated through the cache
             }
         }
         // {
@@ -78,7 +81,6 @@ namespace TS4
         //     channels[ch]->ISR();
         // }
 
-        //asm volatile("dsb"); //wait until register changes propagated through the cache
         digitalWriteFast(14, LOW);
     }
 
