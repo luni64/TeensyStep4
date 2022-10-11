@@ -1,10 +1,14 @@
 #pragma once
 
 #include "Arduino.h"
+#pragma push_macro("abs")
+#undef abs
+
 #include "timers/interfaces.h"
 #include "timers/timerfactory.h"
 #include <algorithm>
 #include <cstdint>
+#include <string>
 
 namespace TS4
 {
@@ -201,3 +205,4 @@ namespace TS4
         }
     }
 }
+#pragma pop_macro("abs")

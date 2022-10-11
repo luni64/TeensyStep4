@@ -1,3 +1,8 @@
+#include "Arduino.h"
+
+#pragma push_macro("abs")
+#undef abs
+
 #include "stepperbase.h"
 #include <algorithm>
 
@@ -95,3 +100,5 @@ namespace TS4
         // SerialUSB1.flush();
     }
 }
+
+#pragma pop_macro("abs")

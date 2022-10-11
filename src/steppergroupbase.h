@@ -1,8 +1,11 @@
 #pragma once
+#include "Arduino.h"
+
+#pragma push_macro("abs")
+#undef abs
 
 #include "stepper.h"
 #include <vector>
-#include "Arduino.h"
 
 namespace TS4
 {
@@ -84,3 +87,5 @@ namespace TS4
         Stepper* leadStepper;
     };
 }
+
+#pragma pop_macro("abs")

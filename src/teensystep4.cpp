@@ -1,3 +1,6 @@
+#pragma push_macro("abs")
+#undef abs
+
 #include "teensystep4.h"
 #include "timers/timerfactory.h"
 #include "timers/interfaces.h"
@@ -14,3 +17,5 @@ namespace TS4
         }
     }
 }
+
+#pragma pop_macro("abs")

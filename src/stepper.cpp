@@ -1,5 +1,9 @@
-#include "stepper.h"
 #include "Arduino.h"
+
+#pragma push_macro("abs")
+#undef abs
+
+#include "stepper.h"
 #include <algorithm>
 
 namespace TS4
