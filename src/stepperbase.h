@@ -18,8 +18,9 @@ namespace TS4
         std::string name;
         bool isMoving = false;
         void emergencyStop();
+        void overrideSpeed(float factor);
 
-        
+
      protected:
         StepperBase(const int stepPin, const int dirPin);
 

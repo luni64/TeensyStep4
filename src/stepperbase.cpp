@@ -107,6 +107,18 @@ namespace TS4
         isMoving = false;
         v_sqr    = 0;
     }
+
+    void StepperBase::overrideSpeed(float factor)
+    {
+        if (mode == mode_t::rotate)
+        {
+            noInterrupts();
+            v_tgt *= factor;
+            v_tgt_sqr = (int64_t)signum(v_tgt) * v_tgt * v_tgt;
+            vDir      = (int32_t)signum(v_tgt_sqr - v_sqr);
+            interrupts();
+        }
+    }
 }
 
 #pragma pop_macro("abs")
