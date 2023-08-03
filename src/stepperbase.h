@@ -37,7 +37,7 @@ namespace TS4
         volatile int32_t target;
 
         int32_t s_tgt;
-        int32_t v_tgt;
+        int32_t v_tgt, v_tgt_orig;
         int64_t v_tgt_sqr;
 
         int32_t twoA;
@@ -134,23 +134,25 @@ namespace TS4
             delayMicroseconds(5);
 
             v_abs = sqrtf(std::abs(v_sqr));
+             SerialUSB.printf("vabs % d\n",v_abs);
             stpTimer->updateFrequency(v_abs);
             doStep();
         } else
         {
-           // SerialUSB1.println("rotISR reached");
+            SerialUSB.println("rotISR reached");
             dir = signum(v_sqr);
             digitalWriteFast(dirPin, dir > 0 ? HIGH : LOW);
             delayMicroseconds(5);
 
             if (v_tgt != 0)
             {
-              //  SerialUSB1.printf("vtgt % d\n",v_tgt);
-                stpTimer->updateFrequency(std::abs(v_tgt));
+                v_abs = sqrtf(std::abs(v_sqr));
+                SerialUSB.printf("vabs % d\n",v_abs);
+                stpTimer->updateFrequency(v_abs);
                 doStep();
             } else
             {
-                //SerialUSB1.printf("rotISR %s stopped\n", name.c_str());
+                SerialUSB.printf("rotISR %s stopped\n", name.c_str());
                 stpTimer->stop();
                 TimerFactory::returnTimer(stpTimer);
                 stpTimer = nullptr;
