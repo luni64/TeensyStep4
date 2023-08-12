@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../../interfaces.h"
-#include "arduino.h"
+#include "Arduino.h"
 #include "imxrt.h"
 
 namespace TS4
