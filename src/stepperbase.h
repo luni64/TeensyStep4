@@ -79,17 +79,19 @@ namespace TS4
         s += 1;
         pos += dir;
 
-        StepperBase* stepper = next;
-        while (stepper != nullptr) // move slave motors if required
-        {
-            if (stepper->B >= 0)
+        if (mode == mode_t::target) {
+            StepperBase* stepper = next;
+            while (stepper != nullptr) // move slave motors if required
             {
-                digitalWriteFast(stepper->stepPin, HIGH);
-                stepper->pos += stepper->dir;
-                stepper->B -= this->A;
+                if (stepper->B >= 0)
+                {
+                    digitalWriteFast(stepper->stepPin, HIGH);
+                    stepper->pos += stepper->dir;
+                    stepper->B -= this->A;
+                }
+                stepper->B += stepper->A;
+                stepper = stepper->next;
             }
-            stepper->B += stepper->A;
-            stepper = stepper->next;
         }
     }
 
@@ -123,6 +125,7 @@ namespace TS4
 
     void StepperBase::rotISR()
     {
+        mode = mode_t::rotate;
         int32_t v_abs;
 
         if (std::abs(v_sqr - v_tgt_sqr) > twoA) // target speed not yet reached
@@ -134,12 +137,12 @@ namespace TS4
             delayMicroseconds(5);
 
             v_abs = sqrtf(std::abs(v_sqr));
-             SerialUSB.printf("vabs % d\n",v_abs);
+            //SerialUSB.printf("vabs % d\n",v_abs);
             stpTimer->updateFrequency(v_abs);
             doStep();
         } else
         {
-            SerialUSB.println("rotISR reached");
+            //SerialUSB.println("rotISR reached");
             dir = signum(v_sqr);
             digitalWriteFast(dirPin, dir > 0 ? HIGH : LOW);
             delayMicroseconds(5);
@@ -147,17 +150,19 @@ namespace TS4
             if (v_tgt != 0)
             {
                 v_abs = sqrtf(std::abs(v_sqr));
-                SerialUSB.printf("vabs % d\n",v_abs);
+                //SerialUSB.printf("vabs % d\n",v_abs);
                 stpTimer->updateFrequency(v_abs);
                 doStep();
             } else
             {
-                SerialUSB.printf("rotISR %s stopped\n", name.c_str());
+                //SerialUSB.printf("rotISR %s stopped\n", name.c_str());
                 stpTimer->stop();
                 TimerFactory::returnTimer(stpTimer);
                 stpTimer = nullptr;
                 isMoving = false;
                 v_sqr = 0;
+                
+                mode = mode_t::target;
             }
         }
 

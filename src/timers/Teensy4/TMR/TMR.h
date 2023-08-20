@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../../interfaces.h"
-#include "arduino.h"
+#include "Arduino.h"
 #include "imxrt.h"
 
 namespace TS4
@@ -103,7 +103,7 @@ namespace TS4
     {
         constexpr unsigned prescale = 32;
         period                      = (150E6 / prescale) / f - pulsewidth - 1.5f;
-        Serial.printf("p: %d\n", period);
+        //Serial.printf("p: %d\n", period);
 
         //constexpr uint16_t pp = p;
     }
