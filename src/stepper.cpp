@@ -16,7 +16,8 @@ namespace TS4
 
     Stepper& Stepper::setAcceleration(uint32_t a)
     {
-        acc = std::min(a, aMax);
+        avMax = ((vMax*vMax)/2);
+        acc = std::min(a, avMax);
         return *this;
     }
 
