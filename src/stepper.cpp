@@ -67,10 +67,6 @@ namespace TS4
     void Stepper::stop()
     {
         StepperBase::startStopping(0, acc);
-        while (isMoving)
-        {
-            delay(10);
-        }
     }
 
     // void moveRelAsync(int delta);
