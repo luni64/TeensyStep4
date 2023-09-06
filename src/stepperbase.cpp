@@ -94,9 +94,13 @@ namespace TS4
     void StepperBase::startStopping(int32_t v_end, uint32_t a)
     {
         // if (!isMoving) return;
-        mode = mode_t::stopping;
-        startRotate(v_end, a);
-        mode = mode_t::stopping;
+        if (mode == mode_t::rotate){
+            mode = mode_t::stopping;
+            startRotate(v_end, a);
+            mode = mode_t::stopping;
+        } else {
+            mode = mode_t::stopping;
+        }
         // SerialUSB1.println("stoprot");
         // SerialUSB1.flush();
     }

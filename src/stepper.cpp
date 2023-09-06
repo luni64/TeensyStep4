@@ -16,7 +16,8 @@ namespace TS4
 
     Stepper& Stepper::setAcceleration(uint32_t a)
     {
-        acc = std::min(a, aMax);
+        avMax = ((vMax*vMax)/2);
+        acc = std::min(a, avMax);
         return *this;
     }
 
@@ -66,10 +67,6 @@ namespace TS4
     void Stepper::stop()
     {
         StepperBase::startStopping(0, acc);
-        while (isMoving)
-        {
-            delay(10);
-        }
     }
 
     // void moveRelAsync(int delta);

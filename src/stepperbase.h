@@ -97,6 +97,19 @@ namespace TS4
 
     void StepperBase::stepISR()
     {
+        if (mode == mode_t::stopping){
+            mode = mode_t::target;
+            if (s < accEnd)                                     // still accelerating
+            { 
+                accEnd = decStart = 0;                          // start deceleration
+                s_tgt             = 2 * s;                      // we need the same way to decelerate as we traveled so far
+            } else if (s < decStart)                            // constant speed phase
+            {
+                decStart = 0;                                   // start deceleration
+                s_tgt    = s + accEnd;                          // normal deceleration distance  ds = distance to end
+            }
+        }
+
         if (s < accEnd) // accelerating
         {
             v = signum(v_sqr) * sqrtf(std::abs(v_sqr));
