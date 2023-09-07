@@ -13,7 +13,7 @@
     "maintainer": true
   },
   "homepage": "https://luni64.github.io/TeensyStep4",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "frameworks": "arduino",
   "platforms": ["Teensy"]
 }
