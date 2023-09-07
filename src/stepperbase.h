@@ -79,19 +79,17 @@ namespace TS4
         s += 1;
         pos += dir;
 
-        if (mode == mode_t::target) {
-            StepperBase* stepper = next;
-            while (stepper != nullptr) // move slave motors if required
+        StepperBase* stepper = next;
+        while (stepper != nullptr) // move slave motors if required
+        {
+            if (stepper->B >= 0)
             {
-                if (stepper->B >= 0)
-                {
-                    digitalWriteFast(stepper->stepPin, HIGH);
-                    stepper->pos += stepper->dir;
-                    stepper->B -= this->A;
-                }
-                stepper->B += stepper->A;
-                stepper = stepper->next;
+                digitalWriteFast(stepper->stepPin, HIGH);
+                stepper->pos += stepper->dir;
+                stepper->B -= this->A;
             }
+            stepper->B += stepper->A;
+            stepper = stepper->next;
         }
     }
 
@@ -100,7 +98,7 @@ namespace TS4
         if (mode == mode_t::stopping){
             mode = mode_t::target;
             if (s < accEnd)                                     // still accelerating
-            { 
+            {
                 accEnd = decStart = 0;                          // start deceleration
                 s_tgt             = 2 * s;                      // we need the same way to decelerate as we traveled so far
             } else if (s < decStart)                            // constant speed phase
@@ -132,6 +130,13 @@ namespace TS4
             stpTimer->stop();
             TimerFactory::returnTimer(stpTimer);
             stpTimer = nullptr;
+            auto *cur = this;
+            while (cur != nullptr) // hack, remove slave motors
+            {
+                auto *tmp = cur->next;
+                cur->next = nullptr;
+                cur = tmp;
+            }
             isMoving = false;
         }
     }
@@ -172,10 +177,16 @@ namespace TS4
                 stpTimer->stop();
                 TimerFactory::returnTimer(stpTimer);
                 stpTimer = nullptr;
-                isMoving = false;
                 v_sqr = 0;
-                
-                mode = mode_t::target;
+
+                auto *cur = this;
+                while (cur != nullptr) // hack, remove slave motors
+                {
+                    auto *tmp = cur->next;
+                    cur->next = nullptr;
+                    cur = tmp;
+                }
+                isMoving = false;
             }
         }
 

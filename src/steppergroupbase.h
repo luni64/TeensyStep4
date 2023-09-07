@@ -41,7 +41,7 @@ namespace TS4
                 // SerialUSB1.flush();
             }                                    //
             sorted[sorted.size() - 1]->next = nullptr; // end of linked list
-            sorted[0]->moveAsync();              // start lead stepper
+            leadStepper->startMoveTo(leadStepper->target, 0, std::abs(leadStepper->vMax), leadStepper->acc );              // start lead stepper
         }
 
         void startRotate()
@@ -80,6 +80,15 @@ namespace TS4
         {
             leadStepper->stopAsync();
         }
+
+        void overrideSpeed(float f)
+        {
+            if(leadStepper != nullptr)
+            {
+                leadStepper->overrideSpeed(f);
+            }
+        }
+
 
      protected:
         std::vector<Stepper*> steppers;
