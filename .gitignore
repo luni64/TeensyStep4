@@ -2,6 +2,7 @@
 .vsteensy/**
 .vscode/**
 makefile
+.pio
 
 # dependency files
 *.d
