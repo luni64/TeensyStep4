@@ -33,7 +33,7 @@ namespace TS4
         int32_t dir;
         int32_t vDir;
 
-        volatile int32_t pos;
+        volatile int32_t pos = 0;
         volatile int32_t target;
 
         int32_t s_tgt;
